@@ -1,0 +1,55 @@
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+import pandas as pd
+
+app = Flask(__name__)
+
+excel_file_path = '/Users/adamalbaghali/Desktop/Tester internship project.xlsx'
+df = pd.read_excel(excel_file_path)
+
+if 'Status' not in df.columns:
+    df['Status'] = 'Design team working on proofs'
+
+@app.route('/api/orders', methods=['GET'])
+def get_all_orders():
+    return jsonify(df.to_dict(orient='records'))
+
+@app.route('/')
+def index():
+    return render_template('front.html')
+
+@app.route('/api/orders/<int:order_id>', methods=['GET'])
+def get_order_by_id(order_id):
+    order = df[df['Order Number'] == order_id].to_dict(orient='records')
+    if not order:
+        return jsonify({'error': 'Order not found'}), 404
+    return jsonify(order[0])
+
+@app.route('/submit_order', methods=['POST'])
+def submit_order():
+    if request.method == 'POST':
+        order_number = request.form.get('orderNumber')
+        email = request.form.get('email')
+        
+        if not order_number or not email:
+            flash('Please provide both order number and email.', 'error')
+            return redirect(url_for('index'))
+        
+        order_info = df[(df['Order Number'] == int(order_number)) & (df['Emails'] == email)].to_dict(orient='records')
+
+        if not order_info:
+            flash('Invalid order number or email. Please try again.', 'error')
+            return redirect(url_for('index'))
+   
+        order_status = order_info[0]['Status']
+      
+        if order_status == 'Design team working on proofs':
+            df.loc[(df['Order Number'] == int(order_number)) & (df['Emails'] == email), 'Status'] = 'Garments ordered from wholesaler'
+        elif order_status == 'Garments ordered from wholesaler':
+            df.loc[(df['Order Number'] == int(order_number)) & (df['Emails'] == email), 'Status'] = 'Job being printed'
+        elif order_status == 'Job being printed':
+            df.loc[(df['Order Number'] == int(order_number)) & (df['Emails'] == email), 'Status'] = 'Order shipped'
+
+        return render_template('next.html', order_status=order_status)
+    
+if __name__ == '__main__':
+    app.run(debug=True)
