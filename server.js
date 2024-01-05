@@ -34,7 +34,7 @@ app.post('/', (req, res) => {
     }
   
     // Check if the order exists in the dataframe
-    const orderIndex = df.findIndex((item) => item['Order Numbers'] === parseInt(orderNumber) && item['Emails'] === email);
+    const orderIndex = df.findIndex((item) => item['Order Numbers'] == parseInt(orderNumber) && item['Emails'] === email);
   
     console.log('Order index:', orderIndex);
   
