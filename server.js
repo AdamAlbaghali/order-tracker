@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const path = require('path');
 
 const fs = require('fs');
 const xlsx = require('xlsx');
@@ -33,7 +34,6 @@ app.post('/', (req, res) => {
       return;
     }
   
-    // Check if the order exists in the dataframe
     const orderIndex = df.findIndex((item) => item['Order Numbers'] == parseInt(orderNumber) && item['Emails'] === email);
   
     console.log('Order index:', orderIndex);
@@ -44,32 +44,43 @@ app.post('/', (req, res) => {
       return;
     }
   
-    const orderStatus = df[orderIndex]['Status'];
+    const currentOrderStatus = df[orderIndex]['Status'];
   
-    console.log('Order status before update:', orderStatus);
+    console.log('Current order status:', currentOrderStatus);
   
-    switch (orderStatus) {
+    let nextOrderStatus;
+  
+    switch (currentOrderStatus) {
       case 'Design team working on proofs':
-        df[orderIndex]['Status'] = 'Garments ordered from wholesaler';
+        nextOrderStatus = 'Garments ordered from wholesaler';
         break;
       case 'Garments ordered from wholesaler':
-        df[orderIndex]['Status'] = 'Job being printed';
+        nextOrderStatus = 'Job being printed';
         break;
       case 'Job being printed':
-        df[orderIndex]['Status'] = 'Order shipped';
+        nextOrderStatus = 'Order shipped';
+        break;
+      default:
+        nextOrderStatus = 'Unknown order status.';
         break;
     }
   
-    console.log('Updated order status:', df[orderIndex]['Status']);
+    console.log('Next order status:', nextOrderStatus);
   
-    res.redirect(`/next?order_status=${orderStatus}`);
+    res.redirect(`/next?currentOrderStatus=${currentOrderStatus}&nextOrderStatus=${nextOrderStatus}`);
   });
   
-
-app.get('/next', (req, res) => {
-  const orderStatus = req.query.order_status;
-  res.sendFile(__dirname + '/next.html');
-});
+  app.get('/next', (req, res) => {
+    const currentOrderStatus = req.query.currentOrderStatus;
+    const nextOrderStatus = req.query.nextOrderStatus;
+  
+    if (!currentOrderStatus || !nextOrderStatus) {
+      return res.send('Invalid request. Please provide both current and next order statuses.');
+    }
+  
+    res.sendFile(path.join(__dirname, 'next.html'));
+  });
+  
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
