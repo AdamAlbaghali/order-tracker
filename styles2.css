@@ -13,17 +13,16 @@ body {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center text */
 }
 
 h2 {
-    text-align: center;
     color: #2c3e50; /* Dark gray header color */
     margin-bottom: 30px;
 }
 
 .column-container {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     margin-top: 30px;
 }
@@ -42,6 +41,20 @@ h2 {
 .column:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+#nextOrderColumn {
+    flex: 0.5; /* Smaller size for next order column */
+    cursor: pointer; /* Add pointer cursor */
+    transition: transform 0.3s; /* Add smooth transition for transform property */
+}
+
+#nextOrderColumn:hover {
+    transform: scale(1.05); /* Enlarge on hover */
+}
+
+#nextOrderColumn.clicked {
+    transform: scale(1.2); /* Further enlarge when clicked */
 }
 
 h3 {

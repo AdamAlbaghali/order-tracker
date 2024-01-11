@@ -1,8 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Status</title>
     <link rel="stylesheet" type="text/css" href="styles2.css">
+    <style>
+        .enlarged {
+            transform: scale(1.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,7 +21,10 @@
                 <p class="status-description" id="currentOrderStatusDescription"></p>
             </div>
             <!-- Dynamic creation of the next order column -->
-            <div class="column" id="nextOrderColumn"></div>
+            <div class="column" id="nextOrderColumn">
+                <h3 id="nextOrderStatusTitle"></h3>
+                <p class="status-description" id="nextOrderStatusDescription"></p>
+            </div>
         </div>
 
         <a href="front.html" class="home-link">
@@ -39,12 +50,24 @@
             // Set 'column' class on individual columns if not 'Order shipped'
             document.getElementById('currentOrderColumn').classList.add('column');
             document.getElementById('nextOrderColumn').classList.add('column');
-            
+
             // Display the next order status if not 'Order shipped'
             document.getElementById('nextOrderColumn').innerHTML = `
                 <h3 id="nextOrderStatusTitle">Next order status: ${nextOrderStatus}</h3>
                 <p class="status-description" id="nextOrderStatusDescription">${getOrderDescription(nextOrderStatus)}</p>
             `;
+
+            // Add click event listener for next order column
+            document.getElementById('nextOrderColumn').addEventListener('click', function() {
+                this.classList.toggle('enlarged');
+                document.getElementById('currentOrderColumn').classList.remove('enlarged');
+            });
+            
+            // Add click event listener for current order column
+            document.getElementById('currentOrderColumn').addEventListener('click', function() {
+                this.classList.toggle('enlarged');
+                document.getElementById('nextOrderColumn').classList.remove('enlarged');
+            });
         }
 
         // Function to get order description based on order status
@@ -65,3 +88,5 @@
     </script>
 </body>
 </html>
+
+
